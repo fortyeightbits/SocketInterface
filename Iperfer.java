@@ -30,7 +30,7 @@ public class Iperfer {
 			{
 				System.out.println(" Error: time must be more than 0");
 				return;
-				
+
 			}
 			serverPort = Integer.parseInt(args[4]);
 			if (serverPort < 1024 || serverPort > 65535)
@@ -38,32 +38,23 @@ public class Iperfer {
 				System.out.println(" Error: port number must be in the range 1024 to 65535");
 				return;
 			}
-			
-			try
+			Socket clientSocket = new Socket(hostname, serverPort);
+			OutputStream out = clientSocket.getOutputStream();
+
+			byte data[] = new byte[1000];
+			long startTime = System.nanoTime();
+			int kBsent = 0;
+			while(System.nanoTime() - startTime != time)
 			{
-				Socket clientSocket = new Socket(hostname, serverPort);
-				OutputStream out = clientSocket.getOutputStream();
-				
-				byte data[] = new byte[1000];
-				long startTime = System.nanoTime();
-				int kBsent = 0;
-				while(System.nanoTime() - startTime != time)
-				{
-					out.write(data);
-					kBsent++;
-				}
-				
-				clientSocket.close();
-				double rate = kBsent/time;
-				System.out.println("sent=" + kBsent + " KB rate=" + rate + " Mbps");
-			
+				out.write(data);
+				kBsent++;
 			}
-			
-			catch(Exception e)
-			{
-				System.out.println("Exception thrown");
-			}
-			
+
+			clientSocket.close();
+			double rate = kBsent/time;
+			System.out.println("sent=" + kBsent + " KB rate=" + rate + " Mbps");
+
+
 		}
 
 		//SERVER
@@ -74,21 +65,29 @@ public class Iperfer {
 			{
 				System.out.println("Error: missing or additional arguments");
 			}
-			
+
 			listenPort = Integer.parseInt(args[2]);
 			if (listenPort < 1024 || listenPort > 65535)
 			{
 				System.out.println("Error: port number must be in the range 1024 to 65535");
 			}
-			
+
 			ServerSocket serverSocket = new ServerSocket(listenPort);
 			Socket clientSocket = serverSocket.accept(); 
 			InputStream in = clientSocket.getInputStream();
 			
-			while ()
+			int kBreceived = 0;
+			long startTime = System.nanoTime();
+			while (!clientSocket.isClosed())
 			{
-				
+				byte[] receivedData = new byte[1000];
+				in.read(receivedData);
+				kBreceived++;
 			}
+			long endTime = System.nanoTime();
+			double rate = kBreceived/elapsed;
+			
+			System.out.println("received=" + kBreceived + " KB rate=" + );
 		}
 
 
