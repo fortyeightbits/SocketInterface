@@ -42,6 +42,20 @@ public class Iperfer {
 			try
 			{
 				Socket clientSocket = new Socket(hostname, serverPort);
+				OutputStream out = clientSocket.getOutputStream();
+				
+				byte data[] = new byte[1000];
+				long startTime = System.nanoTime();
+				int kBsent = 0;
+				while(System.nanoTime() - startTime != time)
+				{
+					out.write(data);
+					kBsent++;
+				}
+				
+				clientSocket.close();
+				double rate = kBsent/time;
+				System.out.println("sent=" + kBsent + " KB rate=" + rate + " Mbps");
 			
 			}
 			
@@ -65,6 +79,15 @@ public class Iperfer {
 			if (listenPort < 1024 || listenPort > 65535)
 			{
 				System.out.println("Error: port number must be in the range 1024 to 65535");
+			}
+			
+			ServerSocket serverSocket = new ServerSocket(listenPort);
+			Socket clientSocket = serverSocket.accept(); 
+			InputStream in = clientSocket.getInputStream();
+			
+			while ()
+			{
+				
 			}
 		}
 
