@@ -3,8 +3,8 @@ import java.io.*;
 
 public class Iperfer {
 
-	//TODO: verify rate and when timing is started
-	//TODO: Catch exceptions
+	static final int KILOBYTE = 1000;
+	static final int NANOSEC = 1000000000;
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 
@@ -43,18 +43,18 @@ public class Iperfer {
 			Socket clientSocket = new Socket(hostname, serverPort);
 			OutputStream out = clientSocket.getOutputStream();
 
-			byte data[] = new byte[1000];
-			long startTime = System.nanoTime();
-			int sent = 0;
-			while(System.nanoTime() - startTime != time)
+			byte data[] = new byte[KILOBYTE];
+			int totalSent = 0;
+			long startTime = System.nanoTime()/NANOSEC;
+			while((System.nanoTime()/NANOSEC) - startTime < time)
 			{
 				out.write(data);
-				sent = sent + 1000;
+				totalSent = totalSent + KILOBYTE;
 			}
-
+			
 			clientSocket.close();
-			double rate = sent/time;
-			System.out.println("sent=" + (sent/1000) + " KB rate=" + rate + " Mbps");
+			double rate = (totalSent*8/1000000)/time;
+			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + rate + " Mbps");
 
 		}
 
@@ -77,17 +77,24 @@ public class Iperfer {
 			Socket clientSocket = serverSocket.accept(); 
 			InputStream in = clientSocket.getInputStream();
 			
-			int received = 0;
-			long startTime = System.nanoTime();
-			while (!clientSocket.isClosed())
+			int totalReceived = 0;
+			int received;
+			byte[] receivedData = new byte[KILOBYTE];
+
+			long startTime = System.nanoTime()/NANOSEC;
+			while (true)
 			{
-				byte[] receivedData = new byte[1000];
-				received = received + in.read(receivedData);
+				received = in.read(receivedData);
+				if (received == -1)
+					break;
+				totalReceived = totalReceived + received;
 			}
-			long endTime = System.nanoTime();
-			double rate = received/(endTime - startTime);
+			long endTime = System.nanoTime()/NANOSEC;
+			System.out.println("start: " + startTime);
+			System.out.println("end: " + endTime);
+			double rate = (totalReceived*8/1000000)/(endTime - startTime);
 			
-			System.out.println("received=" + (received/1000) + " KB rate=" + rate + " Mbps");
+			System.out.println("received=" + (totalReceived/KILOBYTE) + " KB rate=" + rate + " Mbps");
 			serverSocket.close();
 		}
 
