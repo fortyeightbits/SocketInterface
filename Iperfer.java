@@ -3,6 +3,8 @@ import java.io.*;
 
 public class Iperfer {
 
+	//TODO: verify rate and when timing is started
+	//TODO: Catch exceptions
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 
@@ -43,17 +45,16 @@ public class Iperfer {
 
 			byte data[] = new byte[1000];
 			long startTime = System.nanoTime();
-			int kBsent = 0;
+			int sent = 0;
 			while(System.nanoTime() - startTime != time)
 			{
 				out.write(data);
-				kBsent++;
+				sent = sent + 1000;
 			}
 
 			clientSocket.close();
-			double rate = kBsent/time;
-			System.out.println("sent=" + kBsent + " KB rate=" + rate + " Mbps");
-
+			double rate = sent/time;
+			System.out.println("sent=" + (sent/1000) + " KB rate=" + rate + " Mbps");
 
 		}
 
@@ -76,18 +77,18 @@ public class Iperfer {
 			Socket clientSocket = serverSocket.accept(); 
 			InputStream in = clientSocket.getInputStream();
 			
-			int kBreceived = 0;
+			int received = 0;
 			long startTime = System.nanoTime();
 			while (!clientSocket.isClosed())
 			{
 				byte[] receivedData = new byte[1000];
-				in.read(receivedData);
-				kBreceived++;
+				received = received + in.read(receivedData);
 			}
 			long endTime = System.nanoTime();
-			double rate = kBreceived/elapsed;
+			double rate = received/(endTime - startTime);
 			
-			System.out.println("received=" + kBreceived + " KB rate=" + );
+			System.out.println("received=" + (received/1000) + " KB rate=" + rate + " Mbps");
+			serverSocket.close();
 		}
 
 
