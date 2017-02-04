@@ -59,7 +59,6 @@ public class Iperfer {
 			double rate = ((double)totalSent*8/1000000.0)/(elapsed/NANOSEC);
 			NumberFormat formatter = new DecimalFormat("#0.000");
 			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + formatter.format(rate) + " Mbps");
-			System.out.println("client time: " + elapsed);
 
 		}
 
@@ -101,7 +100,6 @@ public class Iperfer {
 			
 			NumberFormat formatter = new DecimalFormat("#0.000");
 			System.out.println("received=" + (totalReceived/KILOBYTE) + " KB rate=" + formatter.format(rate) + " Mbps");
-			System.out.println("server time: " + elapsed);
 			serverSocket.close();
 		}
 
