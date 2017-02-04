@@ -5,7 +5,7 @@ import java.text.*;
 public class Iperfer {
 
 	static final int KILOBYTE = 1000;
-	static final int NANOSEC = 1000000000;
+	static final double NANOSEC = 1000000000.0;
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 
@@ -45,19 +45,21 @@ public class Iperfer {
 			OutputStream out = clientSocket.getOutputStream();
 
 			byte data[] = new byte[KILOBYTE];
-			double totalSent = 0;
-			double startTime = System.nanoTime()/NANOSEC;		
-			while((System.nanoTime()/NANOSEC) - startTime < time)
+			long totalSent = 0;
+			long startTime = System.nanoTime();		
+			while((System.nanoTime()/NANOSEC) - (startTime/NANOSEC) < time)
 			{
 				out.write(data);
 				out.flush();
 				totalSent = totalSent + KILOBYTE;
 			}
-			
+			long endTime = System.nanoTime();
+			long elapsed = endTime - startTime;
 			clientSocket.close();
-			double rate = (totalSent*8/1000000)/time;
+			double rate = ((double)totalSent*8/1000000.0)/(elapsed/NANOSEC);
 			NumberFormat formatter = new DecimalFormat("#0.000");
 			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + formatter.format(rate) + " Mbps");
+			System.out.println("client time: " + elapsed);
 
 		}
 
@@ -80,24 +82,26 @@ public class Iperfer {
 			Socket clientSocket = serverSocket.accept(); 
 			InputStream in = clientSocket.getInputStream();
 			
-			double totalReceived = 0;
-			double received;
+			long totalReceived = 0;
+			long received;
 			byte[] receivedData = new byte[KILOBYTE];
 
-			long startTime = System.nanoTime()/NANOSEC;
+			long startTime = System.nanoTime();
 			while (true)
 			{
 				received = in.read(receivedData);
-				System.out.println(received);
+				//System.out.println(received);
 				if (received == -1)
 					break;
 				totalReceived = totalReceived + received;
 			}
-			long endTime = System.nanoTime()/NANOSEC;
-			double rate = (totalReceived*8/1000000)/(endTime - startTime);
+			long endTime = System.nanoTime();
+			long elapsed = endTime - startTime;
+			double rate = ((double)totalReceived*8/1000000.0)/(elapsed/NANOSEC);
 			
 			NumberFormat formatter = new DecimalFormat("#0.000");
 			System.out.println("received=" + (totalReceived/KILOBYTE) + " KB rate=" + formatter.format(rate) + " Mbps");
+			System.out.println("server time: " + elapsed);
 			serverSocket.close();
 		}
 
