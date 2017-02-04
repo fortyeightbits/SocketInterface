@@ -45,16 +45,16 @@ public class Iperfer {
 
 			byte data[] = new byte[KILOBYTE];
 			int totalSent = 0;
-			long startTime = System.nanoTime()/NANOSEC;
+			long startTime = System.nanoTime()/NANOSEC;		
 			while((System.nanoTime()/NANOSEC) - startTime < time)
 			{
 				out.write(data);
-				totalSent = totalSent + KILOBYTE;
+				totalSent++;
 			}
 			
 			clientSocket.close();
-			double rate = (totalSent*8/1000000)/time;
-			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + rate + " Mbps");
+			double rate = (totalSent*8/1000)/time;
+			System.out.println("sent=" + totalSent + " KB rate=" + rate + " Mbps");
 
 		}
 
@@ -87,14 +87,14 @@ public class Iperfer {
 				received = in.read(receivedData);
 				if (received == -1)
 					break;
-				totalReceived = totalReceived + received;
+				totalReceived = totalReceived + (received/KILOBYTE);
 			}
 			long endTime = System.nanoTime()/NANOSEC;
 			System.out.println("start: " + startTime);
 			System.out.println("end: " + endTime);
-			double rate = (totalReceived*8/1000000)/(endTime - startTime);
+			double rate = (totalReceived*8/1000)/(endTime - startTime);
 			
-			System.out.println("received=" + (totalReceived/KILOBYTE) + " KB rate=" + rate + " Mbps");
+			System.out.println("received=" + totalReceived + " KB rate=" + rate + " Mbps");
 			serverSocket.close();
 		}
 
