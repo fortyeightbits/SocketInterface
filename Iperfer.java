@@ -44,17 +44,18 @@ public class Iperfer {
 			OutputStream out = clientSocket.getOutputStream();
 
 			byte data[] = new byte[KILOBYTE];
-			int totalSent = 0;
-			long startTime = System.nanoTime()/NANOSEC;		
+			double totalSent = 0;
+			double startTime = System.nanoTime()/NANOSEC;		
 			while((System.nanoTime()/NANOSEC) - startTime < time)
 			{
 				out.write(data);
-				totalSent++;
+				out.flush();
+				totalSent = totalSent + KILOBYTE;
 			}
 			
 			clientSocket.close();
-			double rate = (totalSent*8/1000)/time;
-			System.out.println("sent=" + totalSent + " KB rate=" + rate + " Mbps");
+			double rate = (totalSent*8/1000000)/time;
+			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + rate + " Mbps");
 
 		}
 
@@ -77,24 +78,26 @@ public class Iperfer {
 			Socket clientSocket = serverSocket.accept(); 
 			InputStream in = clientSocket.getInputStream();
 			
-			int totalReceived = 0;
-			int received;
+			double totalReceived = 0;
+			double received;
 			byte[] receivedData = new byte[KILOBYTE];
 
 			long startTime = System.nanoTime()/NANOSEC;
 			while (true)
 			{
 				received = in.read(receivedData);
+				System.out.println(received);
 				if (received == -1)
 					break;
-				totalReceived = totalReceived + (received/KILOBYTE);
+				totalReceived = totalReceived + received;
 			}
 			long endTime = System.nanoTime()/NANOSEC;
 			System.out.println("start: " + startTime);
 			System.out.println("end: " + endTime);
-			double rate = (totalReceived*8/1000)/(endTime - startTime);
+			double rate = (totalReceived*8/1000000)/(endTime - startTime);
 			
-			System.out.println("received=" + totalReceived + " KB rate=" + rate + " Mbps");
+			NumberFormat formatter = new DecimalFormat("#0.000");
+			System.out.println("received=" + (totalReceived/KILOBYTE) + " KB rate=" + formatter.format(rate) + " Mbps");
 			serverSocket.close();
 		}
 
