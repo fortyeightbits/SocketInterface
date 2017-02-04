@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import java.text.*;
 
 public class Iperfer {
 
@@ -55,7 +56,8 @@ public class Iperfer {
 			
 			clientSocket.close();
 			double rate = (totalSent*8/1000000)/time;
-			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + rate + " Mbps");
+			NumberFormat formatter = new DecimalFormat("#0.000");
+			System.out.println("sent=" + (totalSent/KILOBYTE) + " KB rate=" + formatter.format(rate) + " Mbps");
 
 		}
 
@@ -92,8 +94,6 @@ public class Iperfer {
 				totalReceived = totalReceived + received;
 			}
 			long endTime = System.nanoTime()/NANOSEC;
-			System.out.println("start: " + startTime);
-			System.out.println("end: " + endTime);
 			double rate = (totalReceived*8/1000000)/(endTime - startTime);
 			
 			NumberFormat formatter = new DecimalFormat("#0.000");
