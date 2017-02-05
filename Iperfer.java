@@ -89,7 +89,6 @@ public class Iperfer {
 			while (true)
 			{
 				received = in.read(receivedData);
-				//System.out.println(received);
 				if (received == -1)
 					break;
 				totalReceived = totalReceived + received;
